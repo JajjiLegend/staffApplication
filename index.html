@@ -5,20 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft Staff Application</title>
     <style>
-        /* Gradient background */
+        /* General styling */
         body {
-            background: linear-gradient(to right, #3a7bd5, #00d2ff); /* Blue gradient */
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(to right, #3a7bd5, #00d2ff); /* Blue gradient */
+        }
+
+        /* Introduction Page */
+        .intro-page {
+            color: white;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            flex-direction: column;
+            text-align: center;
+            opacity: 1;
+            position: relative;
             overflow: hidden;
-            transition: background 0.5s ease;
         }
 
-        /* Center the form */
+        .intro-page h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .intro-page p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            background-color: #00d2ff;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .start-btn:hover {
+            background-color: #3a7bd5;
+        }
+
+        /* Light circle animation */
+        .light {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: light-follow 0.2s ease-out;
+        }
+
+        @keyframes light-follow {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Form Page */
         .form-container {
             background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
             padding: 20px;
@@ -26,7 +84,9 @@
             width: 100%;
             max-width: 600px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease-out;
+            opacity: 0;
+            display: none; /* Initially hidden */
+            transition: opacity 1s ease-in-out; /* Smooth fade-in effect */
         }
 
         h1 {
@@ -49,6 +109,7 @@
             border-radius: 5px;
             font-size: 1em;
             box-sizing: border-box;
+            transition: transform 0.2s ease-in-out;
         }
 
         input[type="submit"] {
@@ -61,20 +122,17 @@
             cursor: pointer;
             width: 100%;
             box-sizing: border-box;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
         input[type="submit"]:hover {
             background-color: #3a7bd5;
+            transform: scale(1.05);
         }
 
-        /* Mouse movement animation */
+        /* Mouse movement effect */
         .form-container {
             position: relative;
-        }
-
-        .form-container:hover {
-            transform: scale(1.05);
         }
 
         /* Responsive design */
@@ -86,7 +144,18 @@
     </style>
 </head>
 <body>
-    <div class="form-container">
+
+    <!-- Introduction Page -->
+    <div class="intro-page" id="intro-page">
+        <h1>Welcome to the Minecraft Staff Application</h1>
+        <p>Click below to start your staff application</p>
+        <button class="start-btn" id="start-btn">Start Application</button>
+        <!-- Light effect following the mouse -->
+        <div class="light" id="light"></div>
+    </div>
+
+    <!-- Application Form Page -->
+    <div class="form-container" id="form-container">
         <h1>Staff Application Form</h1>
         <form id="applicationForm">
             <label for="name">Minecraft Username:</label><br>
@@ -110,16 +179,28 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Mouse movement effect
-        document.addEventListener('mousemove', (e) => {
-            const form = document.querySelector('.form-container');
-            const mouseX = e.clientX / window.innerWidth;
-            const mouseY = e.clientY / window.innerHeight;
-            
-            // Adjusting the movement of the form based on mouse position
-            form.style.transform = `translate(-${mouseX * 10}px, -${mouseY * 10}px)`;
+        // Show the application form when "Start Application" button is clicked
+        document.getElementById('start-btn').addEventListener('click', function() {
+            // Fade out the intro page
+            document.getElementById('intro-page').style.opacity = 0;
+
+            // Wait for the fade-out to finish, then show the form page
+            setTimeout(function() {
+                document.getElementById('intro-page').style.display = 'none'; // Hide intro page
+                const formContainer = document.getElementById('form-container');
+                formContainer.style.display = 'block'; // Show form
+                formContainer.style.opacity = 1; // Fade-in effect
+            }, 1000); // 1 second delay for fade-out animation
         });
 
+        // Mouse follow effect on first page (light circle)
+        document.addEventListener('mousemove', function(e) {
+            const light = document.getElementById('light');
+            light.style.left = e.pageX - 15 + 'px'; // Position light at mouse X
+            light.style.top = e.pageY - 15 + 'px';  // Position light at mouse Y
+        });
+
+        // Form submission to Discord
         $("#applicationForm").submit(function(event) {
             event.preventDefault();  // Prevent form submission
 
@@ -164,7 +245,7 @@
 
             // Send form data to Discord webhook
             $.ajax({
-                url: "https://discord.com/api/webhooks/1338423350204174421/TbOlT4kw2XmCTKdjJ-nsZKhmvTH_6bSzslcN9_7Y--vco2-lq18oCpGT20EEdqiTSGUX",  // Discord Webhook URL
+                url: "https://discord.com/api/webhooks/1338428888363044874/ycPkB8hDTb25M75KHtxId45xssQc6AYi-ZQ63jMgtFfFAmjDk0c7c5Ue4qWv0jhOGMah",  // Updated Discord Webhook URL
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify(discordPayload),
